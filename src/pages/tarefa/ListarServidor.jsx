@@ -94,7 +94,7 @@ const initialRows = [
     "Cedido"
   ),
   createData(
-    953,
+    666,
     "1985-01-01",
     "2001-02-03",
     "Menina Etrom Saymonista",
@@ -114,7 +114,10 @@ const ListarServidor = () => {
     setServidores(initialRows);
   }, []);
 
-  const handleCloseEditar = () => setOpenModal(false);
+  const handleCloseModal = () => {
+    // setServidor(servidorDummy);
+    setOpenModal(false);
+  };
 
   const handleAdicionar = () => {
     setAction("adicionar");
@@ -222,29 +225,18 @@ const ListarServidor = () => {
           >
             Adicionar Servidor
           </Button>
-          <Button
-            size="medium"
-            variant="outlined"
-            sx={{
-              borderColor: "#39a0a7",
-              color: "#39a0a7",
-              "&:hover": { borderColor: "#2d7d84" },
-            }}
-          >
-            Cancelar
-          </Button>
         </CardActions>
       </Card>
       <div>
         <Modal
           open={openModal}
-          onClose={handleCloseEditar}
+          onClose={handleCloseModal}
           aria-labelledby="modal-modal-title"
           aria-describedby="modal-modal-description"
         >
           <div>
             <GerenciarServidor
-              handleCloseEditar={handleCloseEditar}
+              handleCloseModal={handleCloseModal}
               servidor={servidor}
               servidores={servidores}
               setServidores={setServidores}

@@ -13,7 +13,7 @@ import {
 import { useEffect, useState } from "react";
 
 const GerenciarServidor = ({
-  handleCloseEditar,
+  handleCloseModal,
   servidor,
   servidores,
   setServidores,
@@ -39,9 +39,35 @@ const GerenciarServidor = ({
         })
       );
     } else {
+      let regExists =
+        servidores.findIndex((s) => {
+          return s.registroServidor === servidorAtual.registroServidor;
+        }) !== -1;
+
+      if (regExists) return alert("Já existe um servidor com esse registro");
+
+      if (
+        servidorAtual.situacaoServidor === "Desligado" &&
+        !servidorAtual.desligamentoServidor
+      )
+        return alert(
+          "Data de desligamento tem o preenchimento obrigatório para a situação atual"
+        );
+      if (servidorAtual.cpfServidor.length < 14) return alert("CPF Inválido");
+      if (
+        !servidorAtual.registroServidor ||
+        !servidorAtual.admissaoServidor ||
+        !servidorAtual.cpfServidor ||
+        !servidorAtual.nomeServidor ||
+        !servidorAtual.cargoServidor ||
+        !servidorAtual.situacaoServidor
+      ) {
+        return alert("Há campos de preenchimento obrigatório em branco");
+      }
+
       setServidores([...servidores, servidorAtual]);
     }
-    handleCloseEditar();
+    handleCloseModal();
   };
 
   function cpfChange(cpfValue) {
@@ -88,12 +114,14 @@ const GerenciarServidor = ({
                 <FormControl fullWidth>
                   <TextField
                     id="servidor_registro"
+                    type="number"
                     label="Registro"
                     value={servidorAtual.registroServidor}
+                    required
                     onChange={(e) =>
                       setServidorAtual((prev) => ({
                         ...prev,
-                        registroServidor: e.target.value,
+                        registroServidor: parseInt(e.target.value),
                       }))
                     }
                   />
@@ -105,6 +133,7 @@ const GerenciarServidor = ({
                     id="servidor_admissao"
                     type="date"
                     label="Data admissão"
+                    required
                     InputLabelProps={{ shrink: true }}
                     value={
                       servidorAtual.admissaoServidor
@@ -131,6 +160,11 @@ const GerenciarServidor = ({
                         ? servidorAtual.desligamentoServidor
                         : " "
                     }
+                    disabled={
+                      servidorAtual.situacaoServidor !== "Desligado"
+                        ? true
+                        : false
+                    }
                     onChange={(e) => {
                       setServidorAtual((prev) => ({
                         ...prev,
@@ -148,6 +182,7 @@ const GerenciarServidor = ({
                   label="CPF"
                   inputProps={{ maxLength: 14 }}
                   value={cpfFormat}
+                  required
                   onInput={(e) => setCpfFormat(cpfChange(e.target.value))}
                   onChange={(e) =>
                     setServidorAtual((prev) => ({
@@ -162,7 +197,8 @@ const GerenciarServidor = ({
               <FormControl fullWidth>
                 <TextField
                   id="servidor_nome"
-                  label="Nome do Servidor"
+                  label="Nome"
+                  required
                   value={servidorAtual.nomeServidor}
                   onChange={(e) =>
                     setServidorAtual((prev) => ({
@@ -175,6 +211,22 @@ const GerenciarServidor = ({
             </Grid>
             <Grid item xs={12}>
               <FormControl fullWidth>
+                <TextField
+                  id="servidor_cargo"
+                  label="Cargo"
+                  required
+                  value={servidorAtual.cargoServidor}
+                  onChange={(e) =>
+                    setServidorAtual((prev) => ({
+                      ...prev,
+                      cargoServidor: e.target.value,
+                    }))
+                  }
+                />
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl fullWidth required>
                 <InputLabel htmlFor="servidor_situacao">Situação</InputLabel>
                 <Select
                   id="servidor_situacao"
@@ -200,17 +252,7 @@ const GerenciarServidor = ({
               </FormControl>
             </Grid>
             <Grid container spacing={2} mt={0.2}>
-              <Grid
-                container
-                spacing={2}
-                pl={2}
-                mt={2}
-                // sx={{
-                //   display: "flex",
-                //   alignItems: "flex-end",
-                //   justifyContent: "flex-end",
-                // }}
-              >
+              <Grid container spacing={2} pl={2} mt={2}>
                 <Grid item xs={"auto"}>
                   <Button
                     size="large"
@@ -224,7 +266,7 @@ const GerenciarServidor = ({
                   <Button
                     size="large"
                     variant="outlined"
-                    onClick={handleCloseEditar}
+                    onClick={handleCloseModal}
                   >
                     Cancelar
                   </Button>
